@@ -2,10 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Reproductor con Subtítulos Ajustables</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de Video con Doble Subtítulo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -16,68 +14,73 @@
         }
         
         :root {
-            --primary-color: #4a00e0;
-            --secondary-color: #8e2de2;
-            --accent-color: #ff6b6b;
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
             --text-color: #ffffff;
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --subtitle1-color: #ffcc00;
-            --subtitle2-color: #00ccff;
-            --subtitle-size: 1.2rem; /* Tamaño inicial más pequeño */
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --subtitle1-color: #f1c40f;
+            --subtitle2-color: #1abc9c;
+            --subtitle-size: 1.1rem;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            position: fixed;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
         
         .app-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 12px 16px;
+            padding: 12px 20px;
             text-align: center;
-            position: relative;
-            z-index: 10;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         h1 {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            flex: 1;
+            margin-bottom: 5px;
         }
         
-        .app-container {
-            flex: 1;
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .main-container {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
         
         .video-section {
-            flex: 1;
+            flex: 7;
             background: #000;
+            border-radius: 12px;
+            overflow: hidden;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
         
         video {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            background-color: #000;
+            display: block;
+            background: #000;
         }
         
         /* Contenedores de subtítulos */
@@ -94,7 +97,7 @@
         
         .subtitle-bottom-container {
             position: absolute;
-            bottom: 70px;
+            bottom: 60px;
             left: 0;
             width: 100%;
             display: flex;
@@ -114,7 +117,7 @@
             text-align: center;
             background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
-            transition: font-size 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .subtitle-top {
@@ -126,28 +129,25 @@
         }
         
         .controls-section {
-            background: var(--card-bg);
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            overflow-y: auto;
-            max-height: 40vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
         
         .control-card {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 16px;
+            background-color: var(--card-bg);
+            padding: 20px;
             border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
         .control-card h3 {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             font-size: 1.1rem;
             color: var(--accent-color);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .btn {
@@ -159,22 +159,22 @@
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
         }
         
         .btn:active {
-            opacity: 0.9;
-            transform: scale(0.98);
-        }
-        
-        .btn-secondary {
-            background: var(--card-bg);
-            border: 1px solid var(--primary-color);
+            transform: translateY(0);
         }
         
         .file-name {
@@ -185,27 +185,34 @@
         }
         
         .video-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .video-controls .btn {
-            flex: 1;
+            margin-bottom: 0;
             padding: 10px;
-            font-size: 0.8rem;
         }
         
         .subtitle-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .subtitle-controls .btn {
-            flex: 1;
+            margin-bottom: 0;
             padding: 10px;
-            font-size: 0.8rem;
+        }
+        
+        .size-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         .hidden {
@@ -225,43 +232,140 @@
             width: 100vw;
             height: 100vh;
             z-index: 100;
+            border-radius: 0;
         }
         
         .fullscreen-mode .subtitle-bottom-container {
-            bottom: 20px;
+            bottom: 80px;
         }
         
         .close-fullscreen {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
             z-index: 101;
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-        }
-        
-        /* Instalar app button */
-        .install-btn {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             border: none;
+            cursor: pointer;
         }
         
-        /* Loading */
+        /* Tamaños de subtítulos */
+        .subtitle-small {
+            font-size: 0.9rem !important;
+            padding: 6px 10px !important;
+        }
+        
+        .subtitle-medium {
+            font-size: 1.2rem !important;
+            padding: 8px 12px !important;
+        }
+        
+        .subtitle-large {
+            font-size: 1.6rem !important;
+            padding: 10px 15px !important;
+        }
+        
+        /* Media queries para diseño responsivo */
+        @media (min-width: 1024px) {
+            .main-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            
+            .video-section {
+                height: 0;
+                padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+                position: relative;
+            }
+            
+            video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .controls-section {
+                flex: 3;
+                display: flex;
+                flex-direction: column;
+                min-width: 350px;
+                max-width: 400px;
+            }
+        }
+        
+        @media (max-width: 1023px) {
+            .video-section {
+                height: 0;
+                padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+                position: relative;
+            }
+            
+            video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .app-header {
+                padding: 10px 15px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .main-container {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .control-card {
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .video-controls,
+            .subtitle-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                max-width: 95%;
+            }
+            
+            .subtitle-small {
+                font-size: 0.8rem !important;
+            }
+            
+            .subtitle-large {
+                font-size: 1.4rem !important;
+            }
+        }
+        
+        /* Estados de carga */
         .loading {
             position: relative;
             overflow: hidden;
@@ -274,7 +378,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             animation: loading 1.5s infinite;
         }
         
@@ -283,36 +387,37 @@
             100% { transform: translateX(100%); }
         }
         
-        /* Tamaños de subtítulos */
-        .subtitle-small {
-            --subtitle-size: 1rem !important;
+        /* Mejoras visuales */
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 15px 0;
         }
         
-        .subtitle-medium {
-            --subtitle-size: 1.4rem !important;
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
         }
         
-        .subtitle-large {
-            --subtitle-size: 1.8rem !important;
+        .status-loaded {
+            background-color: #2ecc71;
         }
         
-        .size-indicator {
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 5px;
-            opacity: 0.7;
+        .status-not-loaded {
+            background-color: #e74c3c;
         }
     </style>
 </head>
 <body>
     <div class="app-header">
-        <h1>Reproductor Dual Subtítulos</h1>
-        <button id="installBtn" class="install-btn" style="display: none;">
-            <i class="fas fa-download"></i>
-        </button>
+        <h1>Reproductor de Video con Doble Subtítulo</h1>
+        <p class="subtitle">Carga videos locales y personaliza los subtítulos</p>
     </div>
     
-    <div class="app-container">
+    <div class="main-container">
         <div class="video-section">
             <video id="videoPlayer" controls>
                 Tu navegador no soporta la reproducción de video.
@@ -337,35 +442,44 @@
             <div class="control-card">
                 <h3><i class="fas fa-film"></i> Video</h3>
                 <button id="loadVideo" class="btn"><i class="fas fa-upload"></i> Cargar Video</button>
-                <div id="videoName" class="file-name">No se ha cargado ningún video</div>
+                <div id="videoName" class="file-name">
+                    <span class="status-indicator status-not-loaded"></span>
+                    No se ha cargado ningún video
+                </div>
             </div>
             
             <div class="control-card">
-                <h3><i class="fas fa-closed-captioning"></i> Español (Arriba)</h3>
-                <button id="loadSubTop" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo Español</button>
-                <div id="subTopName" class="file-name">No se ha cargado ningún subtítulo</div>
+                <h3><i class="fas fa-closed-captioning"></i> Subtítulo Español (Arriba)</h3>
+                <button id="loadSubTop" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
+                <div id="subTopName" class="file-name">
+                    <span class="status-indicator status-not-loaded"></span>
+                    No se ha cargado ningún subtítulo
+                </div>
             </div>
             
             <div class="control-card">
-                <h3><i class="fas fa-closed-captioning"></i> Inglés (Abajo)</h3>
-                <button id="loadSubBottom" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo Inglés</button>
-                <div id="subBottomName" class="file-name">No se ha cargado ningún subtítulo</div>
+                <h3><i class="fas fa-closed-captioning"></i> Subtítulo Inglés (Abajo)</h3>
+                <button id="loadSubBottom" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
+                <div id="subBottomName" class="file-name">
+                    <span class="status-indicator status-not-loaded"></span>
+                    No se ha cargado ningún subtítulo
+                </div>
             </div>
             
             <div class="control-card">
                 <h3><i class="fas fa-text-height"></i> Tamaño de Subtítulos</h3>
                 <div class="subtitle-controls">
-                    <button id="decreaseSubtitleSize" class="btn"><i class="fas fa-minus"></i> Pequeño</button>
-                    <button id="increaseSubtitleSize" class="btn"><i class="fas fa-plus"></i> Grande</button>
+                    <button id="decreaseSubtitleSize" class="btn"><i class="fas fa-minus"></i> Reducir</button>
+                    <button id="increaseSubtitleSize" class="btn"><i class="fas fa-plus"></i> Aumentar</button>
                 </div>
-                <div id="sizeIndicator" class="size-indicator">Tamaño: Normal</div>
+                <div id="sizeIndicator" class="size-indicator">Tamaño actual: Normal</div>
             </div>
             
             <div class="control-card">
-                <h3><i class="fas fa-play-circle"></i> Controles</h3>
+                <h3><i class="fas fa-play-circle"></i> Controles de Reproducción</h3>
                 <div class="video-controls">
                     <button id="playBtn" class="btn"><i class="fas fa-play"></i> Reproducir</button>
-                    <button id="pauseBtn" class="btn"><i class="fas fa-pause"></i> Pausa</button>
+                    <button id="pauseBtn" class="btn"><i class="fas fa-pause"></i> Pausar</button>
                     <button id="fullscreenBtn" class="btn"><i class="fas fa-expand"></i> Pantalla Completa</button>
                 </div>
             </div>
@@ -395,7 +509,6 @@
             const pauseBtn = document.getElementById('pauseBtn');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
             const closeFullscreenBtn = document.getElementById('closeFullscreen');
-            const installBtn = document.getElementById('installBtn');
             const decreaseSizeBtn = document.getElementById('decreaseSubtitleSize');
             const increaseSizeBtn = document.getElementById('increaseSubtitleSize');
             const sizeIndicator = document.getElementById('sizeIndicator');
@@ -432,15 +545,15 @@
                 if (subtitleSize === 0) {
                     subtitleTopElement.classList.add('subtitle-small');
                     subtitleBottomElement.classList.add('subtitle-small');
-                    sizeIndicator.textContent = 'Tamaño: Pequeño';
+                    sizeIndicator.textContent = 'Tamaño actual: Pequeño';
                 } else if (subtitleSize === 1) {
                     subtitleTopElement.classList.add('subtitle-medium');
                     subtitleBottomElement.classList.add('subtitle-medium');
-                    sizeIndicator.textContent = 'Tamaño: Normal';
+                    sizeIndicator.textContent = 'Tamaño actual: Normal';
                 } else if (subtitleSize === 2) {
                     subtitleTopElement.classList.add('subtitle-large');
                     subtitleBottomElement.classList.add('subtitle-large');
-                    sizeIndicator.textContent = 'Tamaño: Grande';
+                    sizeIndicator.textContent = 'Tamaño actual: Grande';
                 }
                 
                 // Guardar preferencia
@@ -472,7 +585,10 @@
             videoFileInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
+                    const statusIndicator = videoName.querySelector('.status-indicator');
                     videoName.textContent = file.name;
+                    videoName.appendChild(statusIndicator);
+                    
                     const videoURL = URL.createObjectURL(file);
                     video.src = videoURL;
                     
@@ -481,6 +597,8 @@
                     
                     video.onloadeddata = function() {
                         videoName.classList.remove('loading');
+                        statusIndicator.classList.remove('status-not-loaded');
+                        statusIndicator.classList.add('status-loaded');
                     };
                 }
             });
@@ -491,8 +609,14 @@
             subtitleFileInputTop.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
+                    const statusIndicator = subTopName.querySelector('.status-indicator');
                     subTopName.textContent = file.name;
+                    subTopName.appendChild(statusIndicator);
+                    
                     parseSubtitleFile(file, 'top');
+                    
+                    statusIndicator.classList.remove('status-not-loaded');
+                    statusIndicator.classList.add('status-loaded');
                 }
             });
             
@@ -502,8 +626,14 @@
             subtitleFileInputBottom.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
+                    const statusIndicator = subBottomName.querySelector('.status-indicator');
                     subBottomName.textContent = file.name;
+                    subBottomName.appendChild(statusIndicator);
+                    
                     parseSubtitleFile(file, 'bottom');
+                    
+                    statusIndicator.classList.remove('status-not-loaded');
+                    statusIndicator.classList.add('status-loaded');
                 }
             });
             
@@ -556,10 +686,10 @@
                     
                     if (position === 'top') {
                         subtitlesTop = subtitles;
-                        subTopName.textContent = `${file.name} (${subtitles.length} subtítulos cargados)`;
+                        subTopName.innerHTML = `${file.name} <span class="status-indicator status-loaded"></span>`;
                     } else {
                         subtitlesBottom = subtitles;
-                        subBottomName.textContent = `${file.name} (${subtitles.length} subtítulos cargados)`;
+                        subBottomName.innerHTML = `${file.name} <span class="status-indicator status-loaded"></span>`;
                     }
                 };
                 
@@ -664,36 +794,9 @@
                 }
             });
             
-            // Detectar si la app se puede instalar
-            let deferredPrompt;
-            
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installBtn.style.display = 'flex';
-            });
-            
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        installBtn.style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                }
-            });
-            
             // Prevenir acciones por defecto en gestos táctiles
             document.addEventListener('touchmove', function(e) {
                 if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-            
-            // Evitar que la página se desplace
-            document.body.addEventListener('touchstart', function(e) {
-                if (e.target === video) {
                     e.preventDefault();
                 }
             }, { passive: false });
