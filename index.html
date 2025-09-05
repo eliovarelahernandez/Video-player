@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor de Video con Doble Subtítulo</title>
+    <title>Reproductor con Subtítulos Visibles</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -32,7 +32,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
         }
         
         .app-header {
@@ -64,16 +63,17 @@
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
+            flex-direction: column;
         }
         
         .video-section {
-            flex: 7;
+            flex: 1;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
             position: relative;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            min-height: 300px;
+            min-height: 250px;
         }
         
         #video-container {
@@ -90,10 +90,10 @@
             object-fit: contain;
         }
         
-        /* Contenedores de subtítulos */
+        /* Contenedores de subtítulos - Posición fija dentro del viewport */
         .subtitle-top-container {
             position: absolute;
-            top: 15px;
+            top: 10%;
             left: 0;
             width: 100%;
             display: flex;
@@ -104,7 +104,7 @@
         
         .subtitle-bottom-container {
             position: absolute;
-            bottom: 60px;
+            bottom: 15%;
             left: 0;
             width: 100%;
             display: flex;
@@ -136,12 +136,9 @@
         }
         
         .controls-section {
-            flex: 3;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            min-width: 350px;
-            max-width: 400px;
         }
         
         .control-card {
@@ -229,7 +226,7 @@
             display: none;
         }
         
-        /* Pantalla completa - Solución mejorada */
+        /* Pantalla completa - Solución mejorada para móviles */
         .fullscreen-mode {
             position: fixed;
             top: 0;
@@ -240,7 +237,6 @@
             background: #000;
             display: flex;
             flex-direction: column;
-            padding: 0;
         }
         
         .fullscreen-mode .app-header,
@@ -249,17 +245,17 @@
         }
         
         .fullscreen-mode .main-container {
-            flex-direction: column;
             padding: 0;
             max-width: 100%;
             height: 100vh;
+            flex-direction: column;
         }
         
         .fullscreen-mode .video-section {
             flex: 1;
             border-radius: 0;
             height: 100%;
-            position: relative;
+            width: 100%;
         }
         
         .fullscreen-mode video {
@@ -268,24 +264,28 @@
             width: 100%;
         }
         
+        .fullscreen-mode .subtitle-top-container {
+            top: 10%;
+        }
+        
         .fullscreen-mode .subtitle-bottom-container {
-            bottom: 80px;
+            bottom: 15%;
         }
         
         .close-fullscreen {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             z-index: 101;
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             border: none;
             cursor: pointer;
         }
@@ -307,17 +307,13 @@
         }
         
         /* Media queries para diseño responsivo */
-        @media (max-width: 1024px) {
+        @media (min-width: 1024px) {
             .main-container {
-                flex-direction: column;
-            }
-            
-            .controls-section {
-                max-width: 100%;
+                flex-direction: row;
+                align-items: flex-start;
             }
             
             .video-section {
-                min-height: 0;
                 height: 0;
                 padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
             }
@@ -327,6 +323,61 @@
                 top: 0;
                 left: 0;
                 height: 100%;
+            }
+            
+            .controls-section {
+                flex: 3;
+                display: flex;
+                flex-direction: column;
+                min-width: 350px;
+                max-width: 400px;
+            }
+        }
+        
+        @media (max-width: 1023px) {
+            .video-section {
+                height: 0;
+                padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            }
+            
+            video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Ajustes específicos para orientación horizontal en móviles */
+            @media (orientation: landscape) {
+                .main-container {
+                    flex-direction: row;
+                    padding: 10px;
+                    gap: 10px;
+                }
+                
+                .video-section {
+                    flex: 2;
+                    padding-bottom: 0;
+                    height: calc(100vh - 140px);
+                }
+                
+                .controls-section {
+                    flex: 1;
+                    overflow-y: auto;
+                    max-height: calc(100vh - 140px);
+                }
+                
+                .subtitle-top-container {
+                    top: 5%;
+                }
+                
+                .subtitle-bottom-container {
+                    bottom: 10%;
+                }
             }
         }
         
@@ -371,8 +422,50 @@
                 font-size: 1.4rem !important;
             }
             
-            .controls-section {
-                min-width: unset;
+            /* Ajustes para orientación horizontal en móviles pequeños */
+            @media (orientation: landscape) {
+                .app-header {
+                    padding: 8px 12px;
+                }
+                
+                h1 {
+                    font-size: 1.1rem;
+                    margin-bottom: 2px;
+                }
+                
+                .subtitle {
+                    font-size: 0.8rem;
+                }
+                
+                .main-container {
+                    padding: 8px;
+                    gap: 8px;
+                }
+                
+                .video-section {
+                    height: calc(100vh - 100px);
+                }
+                
+                .controls-section {
+                    max-height: calc(100vh - 100px);
+                }
+                
+                .control-card {
+                    padding: 10px;
+                }
+                
+                .btn {
+                    padding: 8px;
+                    font-size: 0.8rem;
+                }
+                
+                .subtitle-top-container {
+                    top: 3%;
+                }
+                
+                .subtitle-bottom-container {
+                    bottom: 8%;
+                }
             }
         }
         
@@ -793,19 +886,39 @@
                 }
             });
             
-            // Ajustar los subtítulos cuando cambia el tamaño de la ventana
-            window.addEventListener('resize', function() {
+            // Ajustar los subtítulos cuando cambia el tamaño de la ventana u orientación
+            window.addEventListener('resize', adjustSubtitlesPosition);
+            window.addEventListener('orientationchange', adjustSubtitlesPosition);
+            
+            function adjustSubtitlesPosition() {
                 // Asegurarse de que los subtítulos se mantengan en su lugar
                 if (body.classList.contains('fullscreen-mode')) {
-                    // Ajustar posición de subtítulos en pantalla completa
-                    const videoHeight = video.offsetHeight;
-                    const videoWidth = video.offsetWidth;
-                    
-                    // Ajustar subtítulo inferior para que no se superponga con controles
-                    const bottomPosition = Math.max(80, videoHeight * 0.1);
-                    document.querySelector('.subtitle-bottom-container').style.bottom = `${bottomPosition}px`;
+                    // En pantalla completa, ajustar según la orientación
+                    if (window.innerHeight > window.innerWidth) {
+                        // Vertical
+                        document.querySelector('.subtitle-top-container').style.top = '10%';
+                        document.querySelector('.subtitle-bottom-container').style.bottom = '15%';
+                    } else {
+                        // Horizontal
+                        document.querySelector('.subtitle-top-container').style.top = '5%';
+                        document.querySelector('.subtitle-bottom-container').style.bottom = '10%';
+                    }
+                } else {
+                    // No en pantalla completa
+                    if (window.innerHeight > window.innerWidth) {
+                        // Vertical
+                        document.querySelector('.subtitle-top-container').style.top = '10%';
+                        document.querySelector('.subtitle-bottom-container').style.bottom = '15%';
+                    } else {
+                        // Horizontal
+                        document.querySelector('.subtitle-top-container').style.top = '5%';
+                        document.querySelector('.subtitle-bottom-container').style.bottom = '10%';
+                    }
                 }
-            });
+            }
+            
+            // Ajustar inicialmente
+            adjustSubtitlesPosition();
             
             // Prevenir acciones por defecto en gestos táctiles
             document.addEventListener('touchmove', function(e) {
