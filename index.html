@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Reproductor con Doble Subtítulo</title>
+    <title>Reproductor con Subtítulos Ajustables</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -22,53 +22,55 @@
             --text-color: #ffffff;
             --bg-color: #121212;
             --card-bg: #1e1e1e;
-            --subtitle1-color: #ffcc00;  /* Español - Parte superior */
-            --subtitle2-color: #00ccff;  /* Inglés - Parte inferior */
+            --subtitle1-color: #ffcc00;
+            --subtitle2-color: #00ccff;
+            --subtitle-size: 1.2rem; /* Tamaño inicial más pequeño */
         }
         
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
-            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 12px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            flex: 1;
         }
         
         .app-container {
+            flex: 1;
             display: flex;
-            flex-direction: row;
-            height: 100vh;
-            width: 100vw;
+            flex-direction: column;
+            overflow: hidden;
         }
         
         .video-section {
-            flex: 7;
-            display: flex;
-            flex-direction: column;
+            flex: 1;
             background: #000;
             position: relative;
-        }
-        
-        .controls-section {
-            flex: 3;
-            background: var(--card-bg);
-            overflow-y: auto;
-            padding: 16px;
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-width: 320px;
-        }
-        
-        .video-container {
-            position: relative;
-            width: 100%;
-            flex: 1;
-            background-color: #000;
-            overflow: hidden;
+            align-items: center;
+            justify-content: center;
         }
         
         video {
@@ -81,7 +83,7 @@
         /* Contenedores de subtítulos */
         .subtitle-top-container {
             position: absolute;
-            top: 10px;
+            top: 15px;
             left: 0;
             width: 100%;
             display: flex;
@@ -92,7 +94,7 @@
         
         .subtitle-bottom-container {
             position: absolute;
-            bottom: 60px; /* Debajo del video para no interferir con controles */
+            bottom: 70px;
             left: 0;
             width: 100%;
             display: flex;
@@ -102,62 +104,41 @@
         }
         
         .subtitle {
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 1.4rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: var(--subtitle-size);
             font-weight: 500;
-            text-shadow: 2px 2px 4px #000, 0 0 12px #000;
-            max-width: 90%; /* 90% del ancho como solicitado */
-            line-height: 1.5;
+            text-shadow: 2px 2px 4px #000, 0 0 8px #000;
+            max-width: 90%;
+            line-height: 1.4;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
+            transition: font-size 0.3s ease;
         }
         
         .subtitle-top {
             color: var(--subtitle1-color);
-            margin-bottom: 10px;
         }
         
         .subtitle-bottom {
             color: var(--subtitle2-color);
-            margin-top: 10px;
         }
         
-        /* Estilos para pantalla completa */
-        :fullscreen .subtitle {
-            font-size: 2rem; /* Tamaño más grande en pantalla completa */
-            max-width: 95%;
-            padding: 16px 20px;
-        }
-        
-        :-webkit-full-screen .subtitle {
-            font-size: 2rem;
-            max-width: 95%;
-            padding: 16px 20px;
-        }
-        
-        :-moz-full-screen .subtitle {
-            font-size: 2rem;
-            max-width: 95%;
-            padding: 16px 20px;
-        }
-        
-        :-ms-fullscreen .subtitle {
-            font-size: 2rem;
-            max-width: 95%;
-            padding: 16px 20px;
-        }
-        
-        :fullscreen .subtitle-bottom-container {
-            bottom: 80px; /* Ajustar posición en pantalla completa */
+        .controls-section {
+            background: var(--card-bg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            max-height: 40vh;
         }
         
         .control-card {
             background-color: rgba(255, 255, 255, 0.05);
             padding: 16px;
             border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
         .control-card h3 {
@@ -169,22 +150,17 @@
             gap: 8px;
         }
         
-        .control-card h3 i {
-            font-size: 1.2rem;
-        }
-        
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             margin-bottom: 10px;
             border: none;
             border-radius: 8px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -192,8 +168,8 @@
         }
         
         .btn:active {
-            transform: scale(0.98);
             opacity: 0.9;
+            transform: scale(0.98);
         }
         
         .btn-secondary {
@@ -210,73 +186,82 @@
         
         .video-controls {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-top: 8px;
         }
         
         .video-controls .btn {
             flex: 1;
-            padding: 12px;
-            font-size: 0.9rem;
+            padding: 10px;
+            font-size: 0.8rem;
         }
         
-        .instructions {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            border-radius: 12px;
-        }
-        
-        .instructions h2 {
-            color: var(--accent-color);
-            margin-bottom: 12px;
-            font-size: 1.2rem;
+        .subtitle-controls {
             display: flex;
-            align-items: center;
             gap: 8px;
+            margin-top: 8px;
         }
         
-        .instructions ol {
-            margin-left: 20px;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+        .subtitle-controls .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.8rem;
         }
         
         .hidden {
             display: none;
         }
         
-        .orientation-warning {
+        /* Pantalla completa */
+        .fullscreen-mode .app-header,
+        .fullscreen-mode .controls-section {
+            display: none;
+        }
+        
+        .fullscreen-mode .video-section {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+        }
+        
+        .fullscreen-mode .subtitle-bottom-container {
+            bottom: 20px;
+        }
+        
+        .close-fullscreen {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 101;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 1000;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .orientation-warning i {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: var(--accent-color);
-        }
-        
-        .orientation-warning p {
+            justify-content: center;
             font-size: 1.2rem;
-            margin-bottom: 10px;
         }
         
-        /* Efectos de carga */
+        /* Instalar app button */
+        .install-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: none;
+        }
+        
+        /* Loading */
         .loading {
             position: relative;
             overflow: hidden;
@@ -298,72 +283,54 @@
             100% { transform: translateX(100%); }
         }
         
-        /* Media query para orientación vertical */
-        @media (max-width: 768px) and (orientation: portrait) {
-            .app-container {
-                display: none;
-            }
-            
-            .orientation-warning {
-                display: flex;
-            }
+        /* Tamaños de subtítulos */
+        .subtitle-small {
+            --subtitle-size: 1rem !important;
         }
         
-        @media (max-width: 768px) and (orientation: landscape) {
-            .orientation-warning {
-                display: none;
-            }
-            
-            .app-container {
-                flex-direction: column;
-            }
-            
-            .video-section {
-                flex: 6;
-            }
-            
-            .controls-section {
-                flex: 4;
-                overflow-y: auto;
-            }
-            
-            .subtitle {
-                font-size: 1.2rem;
-                padding: 10px 14px;
-            }
+        .subtitle-medium {
+            --subtitle-size: 1.4rem !important;
         }
         
-        @media (min-width: 769px) {
-            .orientation-warning {
-                display: none;
-            }
+        .subtitle-large {
+            --subtitle-size: 1.8rem !important;
+        }
+        
+        .size-indicator {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 5px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
-    <div class="orientation-warning">
-        <i class="fas fa-rotate-left fa-spin"></i>
-        <p>Por favor, gira tu dispositivo a horizontal</p>
-        <p>Esta aplicación está optimizada para orientación horizontal</p>
+    <div class="app-header">
+        <h1>Reproductor Dual Subtítulos</h1>
+        <button id="installBtn" class="install-btn" style="display: none;">
+            <i class="fas fa-download"></i>
+        </button>
     </div>
     
     <div class="app-container">
         <div class="video-section">
-            <div class="video-container" id="videoContainer">
-                <video id="videoPlayer" controls>
-                    Tu navegador no soporta la reproducción de video.
-                </video>
-                
-                <!-- Subtítulos en la parte superior (Español) -->
-                <div class="subtitle-top-container">
-                    <div id="subtitleTop" class="subtitle subtitle-top" style="display: none;"></div>
-                </div>
-                
-                <!-- Subtítulos en la parte inferior (Inglés) -->
-                <div class="subtitle-bottom-container">
-                    <div id="subtitleBottom" class="subtitle subtitle-bottom" style="display: none;"></div>
-                </div>
+            <video id="videoPlayer" controls>
+                Tu navegador no soporta la reproducción de video.
+            </video>
+            
+            <!-- Subtítulos en la parte superior (Español) -->
+            <div class="subtitle-top-container">
+                <div id="subtitleTop" class="subtitle subtitle-top" style="display: none;"></div>
             </div>
+            
+            <!-- Subtítulos en la parte inferior (Inglés) -->
+            <div class="subtitle-bottom-container">
+                <div id="subtitleBottom" class="subtitle subtitle-bottom" style="display: none;"></div>
+            </div>
+            
+            <button id="closeFullscreen" class="close-fullscreen" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
         <div class="controls-section">
@@ -386,23 +353,21 @@
             </div>
             
             <div class="control-card">
+                <h3><i class="fas fa-text-height"></i> Tamaño de Subtítulos</h3>
+                <div class="subtitle-controls">
+                    <button id="decreaseSubtitleSize" class="btn"><i class="fas fa-minus"></i> Pequeño</button>
+                    <button id="increaseSubtitleSize" class="btn"><i class="fas fa-plus"></i> Grande</button>
+                </div>
+                <div id="sizeIndicator" class="size-indicator">Tamaño: Normal</div>
+            </div>
+            
+            <div class="control-card">
                 <h3><i class="fas fa-play-circle"></i> Controles</h3>
                 <div class="video-controls">
                     <button id="playBtn" class="btn"><i class="fas fa-play"></i> Reproducir</button>
-                    <button id="pauseBtn" class="btn btn-secondary"><i class="fas fa-pause"></i> Pausa</button>
+                    <button id="pauseBtn" class="btn"><i class="fas fa-pause"></i> Pausa</button>
                     <button id="fullscreenBtn" class="btn"><i class="fas fa-expand"></i> Pantalla Completa</button>
                 </div>
-            </div>
-            
-            <div class="instructions">
-                <h2><i class="fas fa-info-circle"></i> Instrucciones</h2>
-                <ol>
-                    <li>Haz clic en "Cargar Video" para seleccionar un video de tu dispositivo</li>
-                    <li>Haz clic en "Cargar Subtítulo Español" para el subtítulo superior</li>
-                    <li>Haz clic en "Cargar Subtítulo Inglés" para el subtítulo inferior</li>
-                    <li>Reproduce el video y los subtítulos aparecerán en sus posiciones</li>
-                    <li>Usa el botón "Pantalla Completa" para ver los subtítulos en pantalla completa</li>
-                </ol>
             </div>
         </div>
     </div>
@@ -415,7 +380,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Elementos DOM
             const video = document.getElementById('videoPlayer');
-            const videoContainer = document.getElementById('videoContainer');
             const subtitleTopElement = document.getElementById('subtitleTop');
             const subtitleBottomElement = document.getElementById('subtitleBottom');
             const loadVideoBtn = document.getElementById('loadVideo');
@@ -430,10 +394,77 @@
             const playBtn = document.getElementById('playBtn');
             const pauseBtn = document.getElementById('pauseBtn');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const closeFullscreenBtn = document.getElementById('closeFullscreen');
+            const installBtn = document.getElementById('installBtn');
+            const decreaseSizeBtn = document.getElementById('decreaseSubtitleSize');
+            const increaseSizeBtn = document.getElementById('increaseSubtitleSize');
+            const sizeIndicator = document.getElementById('sizeIndicator');
+            const body = document.body;
             
             // Variables para almacenar los subtítulos
             let subtitlesTop = []; // Español - parte superior
             let subtitlesBottom = []; // Inglés - parte inferior
+            
+            // Tamaño de subtítulos (0: pequeño, 1: normal, 2: grande)
+            let subtitleSize = 1;
+            
+            // Cargar preferencias guardadas
+            function loadPreferences() {
+                const savedSize = localStorage.getItem('subtitleSize');
+                if (savedSize !== null) {
+                    subtitleSize = parseInt(savedSize);
+                    updateSubtitleSize();
+                }
+            }
+            
+            // Guardar preferencias
+            function savePreferences() {
+                localStorage.setItem('subtitleSize', subtitleSize.toString());
+            }
+            
+            // Actualizar tamaño de subtítulos
+            function updateSubtitleSize() {
+                // Eliminar clases de tamaño anteriores
+                subtitleTopElement.classList.remove('subtitle-small', 'subtitle-medium', 'subtitle-large');
+                subtitleBottomElement.classList.remove('subtitle-small', 'subtitle-medium', 'subtitle-large');
+                
+                // Aplicar nueva clase según el tamaño
+                if (subtitleSize === 0) {
+                    subtitleTopElement.classList.add('subtitle-small');
+                    subtitleBottomElement.classList.add('subtitle-small');
+                    sizeIndicator.textContent = 'Tamaño: Pequeño';
+                } else if (subtitleSize === 1) {
+                    subtitleTopElement.classList.add('subtitle-medium');
+                    subtitleBottomElement.classList.add('subtitle-medium');
+                    sizeIndicator.textContent = 'Tamaño: Normal';
+                } else if (subtitleSize === 2) {
+                    subtitleTopElement.classList.add('subtitle-large');
+                    subtitleBottomElement.classList.add('subtitle-large');
+                    sizeIndicator.textContent = 'Tamaño: Grande';
+                }
+                
+                // Guardar preferencia
+                savePreferences();
+            }
+            
+            // Disminuir tamaño de subtítulos
+            decreaseSizeBtn.addEventListener('click', function() {
+                if (subtitleSize > 0) {
+                    subtitleSize--;
+                    updateSubtitleSize();
+                }
+            });
+            
+            // Aumentar tamaño de subtítulos
+            increaseSizeBtn.addEventListener('click', function() {
+                if (subtitleSize < 2) {
+                    subtitleSize++;
+                    updateSubtitleSize();
+                }
+            });
+            
+            // Cargar preferencias al iniciar
+            loadPreferences();
             
             // Cargar video desde archivo
             loadVideoBtn.addEventListener('click', () => videoFileInput.click());
@@ -597,71 +628,79 @@
                 video.pause();
             });
             
-            // Pantalla completa - ahora activa el modo pantalla completa en el contenedor completo
+            // Pantalla completa personalizada
             fullscreenBtn.addEventListener('click', function() {
-                if (videoContainer.requestFullscreen) {
-                    videoContainer.requestFullscreen().catch(err => {
-                        console.error('Error attempting to enable fullscreen:', err);
-                    });
-                } else if (videoContainer.webkitRequestFullscreen) {
-                    videoContainer.webkitRequestFullscreen();
-                } else if (videoContainer.msRequestFullscreen) {
-                    videoContainer.msRequestFullscreen();
+                body.classList.add('fullscreen-mode');
+                closeFullscreenBtn.style.display = 'flex';
+                
+                // Ocultar controles nativos después de un tiempo
+                setTimeout(() => {
+                    if (video.controls) {
+                        video.controls = false;
+                    }
+                }, 3000);
+            });
+            
+            // Salir de pantalla completa
+            closeFullscreenBtn.addEventListener('click', function() {
+                body.classList.remove('fullscreen-mode');
+                closeFullscreenBtn.style.display = 'none';
+                video.controls = true;
+            });
+            
+            // Mostrar controles al tocar la pantalla en modo pantalla completa
+            video.addEventListener('click', function() {
+                if (body.classList.contains('fullscreen-mode')) {
+                    // Alternar visibilidad de controles nativos
+                    video.controls = !video.controls;
+                    
+                    // Mostrar temporalmente el botón de cerrar
+                    closeFullscreenBtn.style.display = 'flex';
+                    setTimeout(() => {
+                        if (!video.controls) {
+                            closeFullscreenBtn.style.display = 'none';
+                        }
+                    }, 3000);
                 }
             });
             
-            // Detectar cambios en el modo pantalla completa
-            document.addEventListener('fullscreenchange', updateSubtitlesStyle);
-            document.addEventListener('webkitfullscreenchange', updateSubtitlesStyle);
-            document.addEventListener('mozfullscreenchange', updateSubtitlesStyle);
-            document.addEventListener('MSFullscreenChange', updateSubtitlesStyle);
+            // Detectar si la app se puede instalar
+            let deferredPrompt;
             
-            function updateSubtitlesStyle() {
-                const isFullscreen = document.fullscreenElement || 
-                                    document.webkitFullscreenElement || 
-                                    document.mozFullScreenElement ||
-                                    document.msFullscreenElement;
-                
-                if (isFullscreen) {
-                    // Ajustar estilos para pantalla completa
-                    subtitleTopElement.style.fontSize = '2rem';
-                    subtitleBottomElement.style.fontSize = '2rem';
-                    subtitleTopElement.style.maxWidth = '95%';
-                    subtitleBottomElement.style.maxWidth = '95%';
-                } else {
-                    // Volver a estilos normales
-                    subtitleTopElement.style.fontSize = '';
-                    subtitleBottomElement.style.fontSize = '';
-                    subtitleTopElement.style.maxWidth = '90%';
-                    subtitleBottomElement.style.maxWidth = '90%';
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'flex';
+            });
+            
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
                 }
-            }
+            });
             
-            // Prevenir el desplazamiento con gestos en el video
-            video.addEventListener('touchmove', function(e) {
+            // Prevenir acciones por defecto en gestos táctiles
+            document.addEventListener('touchmove', function(e) {
                 if (e.touches.length > 1) {
-                    e.preventDefault(); // Prevenir zoom en el video
+                    e.preventDefault();
                 }
             }, { passive: false });
             
-            // Detectar orientación
-            function checkOrientation() {
-                if (window.innerHeight > window.innerWidth) {
-                    // Vertical
-                    document.querySelector('.app-container').style.display = 'none';
-                    document.querySelector('.orientation-warning').style.display = 'flex';
-                } else {
-                    // Horizontal
-                    document.querySelector('.app-container').style.display = 'flex';
-                    document.querySelector('.orientation-warning').style.display = 'none';
+            // Evitar que la página se desplace
+            document.body.addEventListener('touchstart', function(e) {
+                if (e.target === video) {
+                    e.preventDefault();
                 }
-            }
-            
-            // Comprobar orientación al cargar y al cambiar
-            window.addEventListener('load', checkOrientation);
-            window.addEventListener('resize', checkOrientation);
-            window.addEventListener('orientationchange', checkOrientation);
+            }, { passive: false });
         });
     </script>
+    
+    <!-- Font Awesome para iconos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </body>
 </html>
