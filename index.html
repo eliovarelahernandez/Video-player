@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor con Subtítulos Visibles</title>
+    <title>Reproductor de Video - Solo Horizontal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -30,7 +30,55 @@
             background: var(--bg-color);
             color: var(--text-color);
             min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Pantalla de orientación vertical */
+        .orientation-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .orientation-warning i {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            color: white;
+            animation: rotateAnimation 2s infinite;
+        }
+        
+        .orientation-warning h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .orientation-warning p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        
+        @keyframes rotateAnimation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(90deg); }
+        }
+        
+        /* Contenido principal (solo visible en horizontal) */
+        .main-content {
+            display: none;
+            height: 100vh;
             flex-direction: column;
         }
         
@@ -38,9 +86,6 @@
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             padding: 12px 20px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
@@ -63,17 +108,16 @@
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            flex-direction: column;
+            overflow: hidden;
         }
         
         .video-section {
-            flex: 1;
+            flex: 7;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
             position: relative;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            min-height: 250px;
         }
         
         #video-container {
@@ -90,10 +134,10 @@
             object-fit: contain;
         }
         
-        /* Contenedores de subtítulos - Posición fija dentro del viewport */
+        /* Contenedores de subtítulos */
         .subtitle-top-container {
             position: absolute;
-            top: 10%;
+            top: 5%;
             left: 0;
             width: 100%;
             display: flex;
@@ -104,7 +148,7 @@
         
         .subtitle-bottom-container {
             position: absolute;
-            bottom: 15%;
+            bottom: 10%;
             left: 0;
             width: 100%;
             display: flex;
@@ -136,9 +180,13 @@
         }
         
         .controls-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            flex: 3;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
+            overflow-y: auto;
+            min-width: 350px;
+            max-width: 400px;
         }
         
         .control-card {
@@ -226,7 +274,7 @@
             display: none;
         }
         
-        /* Pantalla completa - Solución mejorada para móviles */
+        /* Pantalla completa */
         .fullscreen-mode {
             position: fixed;
             top: 0;
@@ -265,11 +313,11 @@
         }
         
         .fullscreen-mode .subtitle-top-container {
-            top: 10%;
+            top: 5%;
         }
         
         .fullscreen-mode .subtitle-bottom-container {
-            bottom: 15%;
+            bottom: 10%;
         }
         
         .close-fullscreen {
@@ -306,166 +354,51 @@
             padding: 10px 15px !important;
         }
         
-        /* Media queries para diseño responsivo */
-        @media (min-width: 1024px) {
-            .main-container {
-                flex-direction: row;
-                align-items: flex-start;
+        /* Mostrar contenido solo en orientación horizontal */
+        @media (orientation: landscape) {
+            .orientation-warning {
+                display: none;
             }
             
-            .video-section {
-                height: 0;
-                padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
-            }
-            
-            video {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-            }
-            
-            .controls-section {
-                flex: 3;
+            .main-content {
                 display: flex;
-                flex-direction: column;
-                min-width: 350px;
-                max-width: 400px;
             }
         }
         
-        @media (max-width: 1023px) {
-            .video-section {
-                height: 0;
-                padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
-            }
-            
-            video {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-            }
-            
-            .controls-section {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Ajustes específicos para orientación horizontal en móviles */
-            @media (orientation: landscape) {
-                .main-container {
-                    flex-direction: row;
-                    padding: 10px;
-                    gap: 10px;
-                }
-                
-                .video-section {
-                    flex: 2;
-                    padding-bottom: 0;
-                    height: calc(100vh - 140px);
-                }
-                
-                .controls-section {
-                    flex: 1;
-                    overflow-y: auto;
-                    max-height: calc(100vh - 140px);
-                }
-                
-                .subtitle-top-container {
-                    top: 5%;
-                }
-                
-                .subtitle-bottom-container {
-                    bottom: 10%;
-                }
-            }
-        }
-        
-        @media (max-width: 600px) {
+        /* Ajustes para diferentes tamaños de pantalla en horizontal */
+        @media (max-height: 500px) and (orientation: landscape) {
             .app-header {
-                padding: 10px 15px;
+                padding: 8px 15px;
             }
             
             h1 {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
             
             .main-container {
-                padding: 15px;
-                gap: 15px;
+                padding: 10px;
+                gap: 10px;
             }
             
             .control-card {
-                padding: 15px;
+                padding: 12px;
             }
             
             .btn {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
-            
-            .video-controls,
-            .subtitle-controls {
-                grid-template-columns: 1fr;
+                padding: 8px;
+                font-size: 0.85rem;
             }
             
             .subtitle {
-                font-size: 1rem;
-                max-width: 95%;
+                font-size: 0.9rem;
             }
             
-            .subtitle-small {
-                font-size: 0.8rem !important;
+            .subtitle-top-container {
+                top: 2%;
             }
             
-            .subtitle-large {
-                font-size: 1.4rem !important;
-            }
-            
-            /* Ajustes para orientación horizontal en móviles pequeños */
-            @media (orientation: landscape) {
-                .app-header {
-                    padding: 8px 12px;
-                }
-                
-                h1 {
-                    font-size: 1.1rem;
-                    margin-bottom: 2px;
-                }
-                
-                .subtitle {
-                    font-size: 0.8rem;
-                }
-                
-                .main-container {
-                    padding: 8px;
-                    gap: 8px;
-                }
-                
-                .video-section {
-                    height: calc(100vh - 100px);
-                }
-                
-                .controls-section {
-                    max-height: calc(100vh - 100px);
-                }
-                
-                .control-card {
-                    padding: 10px;
-                }
-                
-                .btn {
-                    padding: 8px;
-                    font-size: 0.8rem;
-                }
-                
-                .subtitle-top-container {
-                    top: 3%;
-                }
-                
-                .subtitle-bottom-container {
-                    bottom: 8%;
-                }
+            .subtitle-bottom-container {
+                bottom: 8%;
             }
         }
         
@@ -510,77 +443,88 @@
     </style>
 </head>
 <body>
-    <div class="app-header">
-        <h1>Reproductor de Video con Doble Subtítulo</h1>
-        <p class="subtitle">Carga videos locales y personaliza los subtítulos</p>
+    <!-- Pantalla de advertencia para orientación vertical -->
+    <div class="orientation-warning">
+        <i class="fas fa-rotate-left"></i>
+        <h2>Gira tu dispositivo</h2>
+        <p>Esta aplicación está diseñada para usarse en orientación horizontal.</p>
+        <p>Por favor, gira tu dispositivo para continuar.</p>
     </div>
     
-    <div class="main-container">
-        <div class="video-section">
-            <div id="video-container">
-                <video id="videoPlayer" controls>
-                    Tu navegador no soporta la reproducción de video.
-                </video>
-                
-                <!-- Subtítulos en la parte superior (Español) -->
-                <div class="subtitle-top-container">
-                    <div id="subtitleTop" class="subtitle subtitle-top" style="display: none;"></div>
-                </div>
-                
-                <!-- Subtítulos en la parte inferior (Inglés) -->
-                <div class="subtitle-bottom-container">
-                    <div id="subtitleBottom" class="subtitle subtitle-bottom" style="display: none;"></div>
-                </div>
-                
-                <button id="closeFullscreen" class="close-fullscreen" style="display: none;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <!-- Contenido principal (solo visible en horizontal) -->
+    <div class="main-content">
+        <div class="app-header">
+            <h1>Reproductor de Video con Doble Subtítulo</h1>
+            <p class="subtitle">Carga videos locales y personaliza los subtítulos</p>
         </div>
         
-        <div class="controls-section">
-            <div class="control-card">
-                <h3><i class="fas fa-film"></i> Video</h3>
-                <button id="loadVideo" class="btn"><i class="fas fa-upload"></i> Cargar Video</button>
-                <div id="videoName" class="file-name">
-                    <span class="status-indicator status-not-loaded"></span>
-                    No se ha cargado ningún video
+        <div class="main-container">
+            <div class="video-section">
+                <div id="video-container">
+                    <video id="videoPlayer" controls>
+                        Tu navegador no soporta la reproducción de video.
+                    </video>
+                    
+                    <!-- Subtítulos en la parte superior (Español) -->
+                    <div class="subtitle-top-container">
+                        <div id="subtitleTop" class="subtitle subtitle-top" style="display: none;"></div>
+                    </div>
+                    
+                    <!-- Subtítulos en la parte inferior (Inglés) -->
+                    <div class="subtitle-bottom-container">
+                        <div id="subtitleBottom" class="subtitle subtitle-bottom" style="display: none;"></div>
+                    </div>
+                    
+                    <button id="closeFullscreen" class="close-fullscreen" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
             
-            <div class="control-card">
-                <h3><i class="fas fa-closed-captioning"></i> Subtítulo Español (Arriba)</h3>
-                <button id="loadSubTop" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
-                <div id="subTopName" class="file-name">
-                    <span class="status-indicator status-not-loaded"></span>
-                    No se ha cargado ningún subtítulo
+            <div class="controls-section">
+                <div class="control-card">
+                    <h3><i class="fas fa-film"></i> Video</h3>
+                    <button id="loadVideo" class="btn"><i class="fas fa-upload"></i> Cargar Video</button>
+                    <div id="videoName" class="file-name">
+                        <span class="status-indicator status-not-loaded"></span>
+                        No se ha cargado ningún video
+                    </div>
                 </div>
-            </div>
-            
-            <div class="control-card">
-                <h3><i class="fas fa-closed-captioning"></i> Subtítulo Inglés (Abajo)</h3>
-                <button id="loadSubBottom" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
-                <div id="subBottomName" class="file-name">
-                    <span class="status-indicator status-not-loaded"></span>
-                    No se ha cargado ningún subtítulo
+                
+                <div class="control-card">
+                    <h3><i class="fas fa-closed-captioning"></i> Subtítulo Español (Arriba)</h3>
+                    <button id="loadSubTop" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
+                    <div id="subTopName" class="file-name">
+                        <span class="status-indicator status-not-loaded"></span>
+                        No se ha cargado ningún subtítulo
+                    </div>
                 </div>
-            </div>
-            
-            <div class="control-card">
-                <h3><i class="fas fa-text-height"></i> Tamaño de Subtítulos</h3>
-                <div class="subtitle-controls">
-                    <button id="decreaseSubtitleSize" class="btn"><i class="fas fa-minus"></i> Reducir</button>
-                    <button id="increaseSubtitleSize" class="btn"><i class="fas fa-plus"></i> Aumentar</button>
+                
+                <div class="control-card">
+                    <h3><i class="fas fa-closed-captioning"></i> Subtítulo Inglés (Abajo)</h3>
+                    <button id="loadSubBottom" class="btn"><i class="fas fa-upload"></i> Cargar Subtítulo</button>
+                    <div id="subBottomName" class="file-name">
+                        <span class="status-indicator status-not-loaded"></span>
+                        No se ha cargado ningún subtítulo
+                    </div>
                 </div>
-                <div id="sizeIndicator" class="size-indicator">Tamaño actual: Normal</div>
-            </div>
-            
-            <div class="control-card">
-                <h3><i class="fas fa-play-circle"></i> Controles de Reproducción</h3>
-                <div class="video-controls">
-                    <button id="playBtn" class="btn"><i class="fas fa-play"></i> Reproducir</button>
-                    <button id="pauseBtn" class="btn"><i class="fas fa-pause"></i> Pausar</button>
-                    <button id="fullscreenBtn" class="btn"><i class="fas fa-expand"></i> Pantalla Completa</button>
+                
+                <div class="control-card">
+                    <h3><i class="fas fa-text-height"></i> Tamaño de Subtítulos</h3>
+                    <div class="subtitle-controls">
+                        <button id="decreaseSubtitleSize" class="btn"><i class="fas fa-minus"></i> Reducir</button>
+                        <button id="increaseSubtitleSize" class="btn"><i class="fas fa-plus"></i> Aumentar</button>
+                    </div>
+                    <div id="sizeIndicator" class="size-indicator">Tamaño actual: Normal</div>
+                </div>
+                
+                <div class="control-card">
+                    <h3><i class="fas fa-play-circle"></i> Controles de Reproducción</h3>
+                    <div class="video-controls">
+                        <button id="playBtn" class="btn"><i class="fas fa-play"></i> Reproducir</button>
+                        <button id="pauseBtn" class="btn"><i class="fas fa-pause"></i> Pausar</button>
+                        <button id="fullscreenBtn" class="btn"><i class="fas fa-expand"></i> Pantalla Completa</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -614,7 +558,8 @@
             const increaseSizeBtn = document.getElementById('increaseSubtitleSize');
             const sizeIndicator = document.getElementById('sizeIndicator');
             const body = document.body;
-            const mainContainer = document.querySelector('.main-container');
+            const mainContent = document.querySelector('.main-content');
+            const orientationWarning = document.querySelector('.orientation-warning');
             
             // Variables para almacenar los subtítulos
             let subtitlesTop = []; // Español - parte superior
@@ -622,6 +567,24 @@
             
             // Tamaño de subtítulos (0: pequeño, 1: normal, 2: grande)
             let subtitleSize = 1;
+            
+            // Función para verificar orientación
+            function checkOrientation() {
+                if (window.innerHeight > window.innerWidth) {
+                    // Vertical
+                    mainContent.style.display = 'none';
+                    orientationWarning.style.display = 'flex';
+                } else {
+                    // Horizontal
+                    mainContent.style.display = 'flex';
+                    orientationWarning.style.display = 'none';
+                }
+            }
+            
+            // Verificar orientación al cargar y al cambiar de tamaño
+            window.addEventListener('load', checkOrientation);
+            window.addEventListener('resize', checkOrientation);
+            window.addEventListener('orientationchange', checkOrientation);
             
             // Cargar preferencias guardadas
             function loadPreferences() {
@@ -881,21 +844,20 @@
             // También salir de pantalla completa con la tecla ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && body.classList.contains('fullscreen-mode')) {
-                    body.classList.remove('fullscreen-mode');
+                    body.classList.remove('fulltitle-mode');
                     closeFullscreenBtn.style.display = 'none';
                 }
             });
             
             // Ajustar los subtítulos cuando cambia el tamaño de la ventana u orientación
             window.addEventListener('resize', adjustSubtitlesPosition);
-            window.addEventListener('orientationchange', adjustSubtitlesPosition);
             
             function adjustSubtitlesPosition() {
                 // Asegurarse de que los subtítulos se mantengan en su lugar
                 if (body.classList.contains('fullscreen-mode')) {
                     // En pantalla completa, ajustar según la orientación
                     if (window.innerHeight > window.innerWidth) {
-                        // Vertical
+                        // Vertical (no debería ocurrir en modo pantalla completa)
                         document.querySelector('.subtitle-top-container').style.top = '10%';
                         document.querySelector('.subtitle-bottom-container').style.bottom = '15%';
                     } else {
